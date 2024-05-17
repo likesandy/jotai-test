@@ -1,40 +1,44 @@
-import { atom, useAtom } from 'jotai'
+import { atom, useAtom, useAtomValue } from 'jotai'
+import { focusAtom } from 'jotai-optics'
 
-const aaaAtom = atom(0)
-const bbbAtom = atom(0)
-// const sumAtom = atom((get) => get(aaaAtom) + get(bbbAtom))
+const objAtom = atom({
+  count: 0,
+  text: 'bbb',
+})
+const textAtom = focusAtom(objAtom, (optic) => optic.prop('text'))
 
 function App() {
-  // const sumCount = useAtom(sumAtom)
   return (
     <>
       <Aaa />
       <Bbb />
-      {/* {sumCount} */}
     </>
   )
 }
 function Aaa() {
-  const [count, setCount] = useAtom(aaaAtom)
-  console.log('a重新渲染')
+  const [obj, setCount] = useAtom(objAtom)
+  console.log('Aaa重新渲染')
   return (
     <div>
-      aaa:{count}
-      <button onClick={() => setCount(count + 1)}>+1</button>
+      aaa:{obj.count}
+      <button
+        onClick={() =>
+          setCount((pre) => ({
+            ...pre,
+            count: pre.count + 1,
+          }))
+        }
+      >
+        +1
+      </button>
     </div>
   )
 }
 
 function Bbb() {
-  const [count, setCount] = useAtom(bbbAtom)
+  const text = useAtomValue(textAtom)
   console.log('b重新渲染')
-  return (
-    <div>
-      bbb:{count}
-      <button onClick={() => setCount(count + 1)}>+1</button>
-    </div>
-  )
+  return <div>bbb:{text}</div>
 }
 
 export default App
-
