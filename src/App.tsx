@@ -1,40 +1,41 @@
 import { atom, useAtom } from 'jotai'
 
-const aaaAtom = atom(0)
-const bbbAtom = atom(0)
-// const sumAtom = atom((get) => get(aaaAtom) + get(bbbAtom))
+const listAtom = atom([])
+const fetchDataAtom = atom(
+  (get) => get(listAtom),
+  async (get, set, param) => {
+    const data = await getListById(param)
+    set(listAtom, data)
+  }
+)
 
 function App() {
-  // const sumCount = useAtom(sumAtom)
-  return (
-    <>
-      <Aaa />
-      <Bbb />
-      {/* {sumCount} */}
-    </>
-  )
+  return <Aaa />
 }
 function Aaa() {
-  const [count, setCount] = useAtom(aaaAtom)
-  console.log('a重新渲染')
+  const [list, fetchData] = useAtom(fetchDataAtom)
   return (
     <div>
-      aaa:{count}
-      <button onClick={() => setCount(count + 1)}>+1</button>
-    </div>
-  )
-}
-
-function Bbb() {
-  const [count, setCount] = useAtom(bbbAtom)
-  console.log('b重新渲染')
-  return (
-    <div>
-      bbb:{count}
-      <button onClick={() => setCount(count + 1)}>+1</button>
+      <button onClick={() => fetchData(2)}>加载列表</button>
+      <ul>
+        {list?.map((item) => {
+          return <li key={item}>{item}</li>
+        })}
+      </ul>
     </div>
   )
 }
 
 export default App
 
+async function getListById(id) {
+  const data = {
+    1: ['a1', 'a2', 'a3'],
+    2: ['b1', 'b2', 'b3', 'b4'],
+  }
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(data[id])
+    }, 2000)
+  })
+}
