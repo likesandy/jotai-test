@@ -1,39 +1,24 @@
-import { atom, useAtom } from 'jotai'
+import { atom, useAtomValue, useSetAtom } from 'jotai'
 
-const aaaAtom = atom(0)
-const bbbAtom = atom(0)
-// const sumAtom = atom((get) => get(aaaAtom) + get(bbbAtom))
-
+const countAtom = atom(0)
 function App() {
-  // const sumCount = useAtom(sumAtom)
   return (
     <>
       <Aaa />
       <Bbb />
-      {/* {sumCount} */}
     </>
   )
 }
 function Aaa() {
-  const [count, setCount] = useAtom(aaaAtom)
-  console.log('a重新渲染')
-  return (
-    <div>
-      aaa:{count}
-      <button onClick={() => setCount(count + 1)}>+1</button>
-    </div>
-  )
+  console.log('Aaa重新渲染')
+  const count = useAtomValue(countAtom)
+  return <div>{count}</div>
 }
 
 function Bbb() {
-  const [count, setCount] = useAtom(bbbAtom)
-  console.log('b重新渲染')
-  return (
-    <div>
-      bbb:{count}
-      <button onClick={() => setCount(count + 1)}>+1</button>
-    </div>
-  )
+  console.log('Bbb重新渲染')
+  const setCount = useSetAtom(countAtom)
+  return <button onClick={() => setCount((c) => c + 1)}>+1</button>
 }
 
 export default App
