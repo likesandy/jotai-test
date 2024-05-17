@@ -1,47 +1,34 @@
-import { atom, useAtom, useStore } from 'jotai'
+import { atom, useAtom, useAtomValue } from 'jotai'
+import { Suspense } from 'react'
 
-const aaaAtom = atom(0)
-const bbbAtom = atom(0)
-// 派生原子；基于其他原子定义状态
-// const sumAtom = atom((get) => get(aaaAtom) + get(bbbAtom))
+const asyncAtom = atom(async () => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(10)
+    }, 2000)
+  })
+})
+
+const countAtom = atom(0)
+const request = () => new Promise((r) => setTimeout(r, 2000, 10))
 
 function App() {
-  // 获取atom状态
-  // 虽然store.get(xx)也可以获取
-  // 但是这个hook会自动订阅，当状态变化时组件会重新渲染
-  // const sumCount = useAtom(sumAtom)
-
-  // useAtom = [useAtomValue,useSetAtom]
-  useStore().sub(aaaAtom, () => {
-    console.log('aaaAtom变化了')
-  })
   return (
-    <>
+    <Suspense fallback={<div>loading...</div>}>
       <Aaa />
-      <Bbb />
-      {/* {sumCount} */}
-    </>
+    </Suspense>
   )
 }
 function Aaa() {
-  const [count, setCount] = useAtom(aaaAtom)
-  console.log('a重新渲染')
+  // 也可以在改变atom的时候传入promise触发Suspense
+  const data = useAtomValue(asyncAtom)
+  const [count, setCount] = useAtom(countAtom)
   return (
-    <div>
-      aaa:{count}
-      <button onClick={() => setCount(count + 1)}>+1</button>
-    </div>
-  )
-}
-
-function Bbb() {
-  const [count, setCount] = useAtom(bbbAtom)
-  console.log('b重新渲染')
-  return (
-    <div>
-      bbb:{count}
-      <button onClick={() => setCount(count + 1)}>+1</button>
-    </div>
+    <>
+      <div>aaa:{data}</div>
+      <div>count:{count}</div>
+      <button onClick={() => setCount(request)}>+1</button>
+    </>
   )
 }
 
